@@ -1,55 +1,21 @@
 const express = require('express');
-const pool = require('./db');
-const { wrapAsync } = require('./utils');
+const morgan = require('morgan');
+
+const mountRoutes = require('./routes/index');
 
 const app = express();
 
 app.use(express.json());
+app.use(morgan('dev'));
 
-app.use((req, res, next) => {
-  console.log('Request', req.originalUrl);
-  next();
-});
-
-app.post(
-  '/books',
-  wrapAsync(async (req, res) => {
-    const { name } = req.body;
-
-    const doc = await pool.query(
-      'INSERT INTO books(book_name) VALUES($1) RETURNING *',
-      [name]
-    );
-    res.send(doc.rows);
-  })
-);
-
-app.get(
-  '/books',
-  wrapAsync(async (req, res) => {
-    const doc = await pool.query('SELECT * FROM books');
-    res.send(doc.rows);
-  })
-);
-
-app.delete(
-  '/books',
-  wrapAsync(async (req, res) => {
-    const { name } = req.body;
-
-    const doc = await pool.query(
-      'DELETE FROM books WHERE book_name = $1 RETURNING *',
-      [name]
-    );
-
-    res.send(doc.rows);
-  })
-);
+mountRoutes(app);
 
 const PORT = 3000;
 
-app.use((req, res, next, err) => {
-  res.send('Error!');
+app.use((err, req, res, next) => {
+  let message = 'Error!';
+  if (err.message) message = err.message;
+  res.send(message);
 });
 
 app.listen(PORT, () => {

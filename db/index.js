@@ -8,4 +8,6 @@ const pool = new Pool({
   database: 'booksapp',
 });
 
-module.exports = pool;
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+};

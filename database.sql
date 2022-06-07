@@ -19,3 +19,4 @@ CREATE TABLE authors_books(
     FOREIGN KEY (book_id)
         REFERENCES books(book_id)
 );
+
