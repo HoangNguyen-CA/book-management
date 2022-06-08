@@ -20,3 +20,26 @@ CREATE TABLE authors_books(
         REFERENCES books(book_id)
 );
 
+
+/* Update Foreign Key Constraint */
+
+ALTER TABLE authors_books
+DROP CONSTRAINT "authors_books_author_id_fkey";
+
+ALTER TABLE authors_books
+DROP CONSTRAINT "authors_books_book_id_fkey";
+
+ALTER TABLE authors_books
+ADD CONSTRAINT books_id_fk
+FOREIGN KEY (book_id)
+REFERENCES books(book_id)
+ON DELETE CASCADE;
+
+
+ALTER TABLE authors_books
+ADD CONSTRAINT authors_id_fk
+FOREIGN KEY (author_id)
+REFERENCES authors(author_id)
+ON DELETE CASCADE;
+
+/* */
