@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+const db = require('./db/index');
 
 const mountRoutes = require('./routes/index');
 
@@ -12,8 +13,13 @@ mountRoutes(app);
 
 const PORT = 3000;
 
-app.use((err, req, res, next) => {
-  let message = 'Error!';
+app.use(async (err, req, res, next) => {
+  try {
+    await db.query('ROLLBACK'); //rollback any transactions
+    console.log('ROLLBACK');
+  } catch (e) {}
+
+  let message = 'internal server error';
   if (err.message) message = err.message;
   res.send(message);
 });

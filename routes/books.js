@@ -1,5 +1,6 @@
 const Router = require('express-promise-router');
 const db = require('../db/index');
+const format = require('pg-format');
 
 const router = new Router();
 
@@ -14,15 +15,19 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { bookName, authorId } = req.body;
+  const { bookName, authorIds } = req.body;
 
   if (bookName == undefined) throw new Error('book name not defined');
-  if (authorId == undefined) throw new Error('author id not defined');
+  if (authorIds == undefined) throw new Error('authorIds not defined');
+  if (authorIds.constructor !== Array)
+    throw new Error('authorIds must be an array');
 
   const authorDoc = await db.query(
-    'SELECT * FROM authors WHERE author_id = $1',
-    [authorId]
+    format('SELECT * FROM authors WHERE author_id IN %L', [authorIds])
   );
+
+  if (authorDoc.rows.length !== authorIds.length)
+    throw new Error('authorIds array not valid');
 
   if (authorDoc.rows.length === 0)
     throw new Error('author with given id not found');
@@ -33,15 +38,19 @@ router.post('/', async (req, res) => {
     'INSERT INTO books(book_name) VALUES($1) RETURNING *',
     [bookName]
   );
+  const bookId = bookDoc.rows[0].book_id;
+  const connectValues = authorIds.map((author_id) => [author_id, bookId]);
 
   const connectDoc = await db.query(
-    'INSERT INTO authors_books(author_id, book_id) VALUES($1, $2)',
-    [authorId, bookDoc.rows[0].book_id]
+    format(
+      'INSERT INTO authors_books(author_id, book_id) VALUES %L RETURNING *',
+      connectValues
+    )
   );
 
   await db.query('COMMIT');
 
-  res.send(bookDoc.rows);
+  res.send(connectDoc.rows);
 });
 
 router.delete('/:id', async (req, res) => {
