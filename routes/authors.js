@@ -9,6 +9,24 @@ router.get('/', async (req, res) => {
   res.json(doc.rows);
 });
 
+router.get('/:id', async (req, res) => {
+  const { id } = req.params;
+
+  const authorDoc = await db.query(
+    'SELECT * FROM authors WHERE author_id = $1',
+    [id]
+  );
+
+  if (authorDoc.rows.length === 0) throw Error("author doesn't exist");
+
+  const booksDoc = await db.query(
+    'SELECT books.* FROM authors_books JOIN books ON authors_books.book_id = books.book_id WHERE author_id = $1',
+    [id]
+  );
+
+  res.send({ author: authorDoc.rows[0], books: booksDoc.rows });
+});
+
 router.post('/', async (req, res) => {
   const { authorName } = req.body;
   if (authorName == undefined) throw new Error('author name not defined');
@@ -19,22 +37,6 @@ router.post('/', async (req, res) => {
   );
 
   res.json(doc.rows);
-});
-
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-
-  const booksDoc = await db.query(
-    'SELECT * FROM authors_books JOIN books ON authors_books.book_id = books.book_id WHERE author_id = $1',
-    [id]
-  );
-
-  const authorDoc = await db.query(
-    'SELECT * FROM authors WHERE author_id = $1',
-    [id]
-  );
-
-  res.send({ author: authorDoc.rows[0], books: booksDoc.rows });
 });
 
 router.delete('/:id', async (req, res) => {

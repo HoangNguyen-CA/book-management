@@ -11,7 +11,20 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  res.send('TODO');
+  const { id } = req.params;
+
+  const bookDoc = await db.query('SELECT * FROM books WHERE book_id = $1', [
+    id,
+  ]);
+
+  if (bookDoc.rows.length === 0) throw Error("book doesn't exist");
+
+  const authorsDoc = await db.query(
+    'SELECT authors.* FROM authors_books JOIN authors ON authors_books.author_id = authors.author_id WHERE book_id = $1',
+    [id]
+  );
+
+  res.send({ book: bookDoc.rows[0], authors: authorsDoc.rows });
 });
 
 router.post('/', async (req, res) => {
@@ -39,6 +52,7 @@ router.post('/', async (req, res) => {
     [bookName]
   );
   const bookId = bookDoc.rows[0].book_id;
+  if (bookId == null) throw new Error('bookId not defined');
   const connectValues = authorIds.map((author_id) => [author_id, bookId]);
 
   const connectDoc = await db.query(
@@ -59,6 +73,19 @@ router.delete('/:id', async (req, res) => {
   const doc = await db.query(
     'DELETE FROM books WHERE book_id = $1 RETURNING *',
     [id]
+  );
+
+  res.send(doc.rows);
+});
+
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  const { bookName } = req.body;
+  if (bookName == undefined) throw new Error('book name not defined');
+
+  const doc = await db.query(
+    'UPDATE books SET book_name = $2 WHERE book_id = $1 RETURNING *',
+    [id, bookName]
   );
 
   res.send(doc.rows);
