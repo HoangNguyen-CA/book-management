@@ -1,16 +1,30 @@
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link as RouterLink } from 'react-router-dom';
+import { AppBar, Link, Toolbar } from '@mui/material';
 
 const MainLayout = () => {
   return (
     <>
-      <div>
-        <Link to='/'>Home</Link>
-        <Link to='/authors'>Authors</Link>
-        <Link to='/books'>Books</Link>
-      </div>
-      <div>
-        <Outlet />
-      </div>
+      <AppBar position='static'>
+        <Toolbar
+          sx={{
+            typography: 'body1',
+            '& > :not(style) + :not(style)': {
+              ml: 2,
+            },
+          }}
+        >
+          <Link to='/' component={RouterLink} color='inherit'>
+            Home
+          </Link>
+          <Link to='/authors' component={RouterLink} color='inherit'>
+            Authors
+          </Link>
+          <Link to='/books' component={RouterLink} color='inherit'>
+            Books
+          </Link>
+        </Toolbar>
+      </AppBar>
+      <Outlet />
     </>
   );
 };
