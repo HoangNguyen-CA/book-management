@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
     [id]
   );
 
-  res.send({ book: bookDoc.rows[0], authors: authorsDoc.rows });
+  res.send({ ...bookDoc.rows[0], authors: authorsDoc.rows });
 });
 
 router.post('/', async (req, res) => {
