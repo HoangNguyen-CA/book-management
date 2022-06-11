@@ -9,10 +9,9 @@ const Book = ({ author }: Props) => {
   return (
     <Paper
       variant='outlined'
-      elevation={2}
       sx={{
         p: 2,
-        'text-align': 'center',
+        textAlign: 'center',
         color: 'deepPurple-500',
       }}
     >

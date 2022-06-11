@@ -5,24 +5,27 @@ interface Props {
   book: BookInfo;
 }
 
-const Book = ({ book }: Props) => {
+const BookPreview = ({ book }: Props) => {
+  const authors =
+    book.authors.length > 0
+      ? book.authors.map((a) => a.author_name).join(', ')
+      : 'No author';
   return (
     <Paper
       variant='outlined'
-      elevation={2}
       sx={{
         p: 2,
-        'text-align': 'center',
+        textAlign: 'center',
         color: 'deepPurple-500',
       }}
     >
       <Stack>
-        <Typography variant='body1'> {book.book_id}</Typography>
-
+        <Typography variant='caption'> {book.book_id}</Typography>
         <Typography variant='h4'> {book.book_name}</Typography>
+        <Typography variant='subtitle1'>Written by: {authors}</Typography>
       </Stack>
     </Paper>
   );
 };
 
-export default Book;
+export default BookPreview;

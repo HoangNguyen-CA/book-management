@@ -5,9 +5,35 @@ const format = require('pg-format');
 const router = new Router();
 
 router.get('/', async (req, res) => {
-  const doc = await db.query('SELECT * FROM books');
+  const doc = await db.query(
+    'SELECT books.book_id, book_name, authors.author_id, author_name FROM books LEFT JOIN authors_books ON books.book_id = authors_books.book_id LEFT JOIN authors ON authors_books.author_id = authors.author_id'
+  );
 
-  res.send(doc.rows);
+  const booksMap = new Map();
+
+  doc.rows.forEach((element) => {
+    let bookInfo = booksMap.get(element.book_id);
+    if (!bookInfo) {
+      let authorsArray = [];
+      if (element.author_id && element.author_name)
+        authorsArray.push({
+          author_id: element.author_id,
+          author_name: element.author_name,
+        });
+      booksMap.set(element.book_id, {
+        book_name: element.book_name,
+        book_id: element.book_id,
+        authors: authorsArray,
+      });
+    } else {
+      bookInfo.authors.push({
+        author_id: element.author_id,
+        author_name: element.author_name,
+      });
+    }
+  });
+
+  res.send([...booksMap.values()]);
 });
 
 router.get('/:id', async (req, res) => {
@@ -35,36 +61,45 @@ router.post('/', async (req, res) => {
   if (authorIds.constructor !== Array)
     throw new Error('authorIds must be an array');
 
-  const authorDoc = await db.query(
-    format('SELECT * FROM authors WHERE author_id IN %L', [authorIds])
-  );
+  if (authorIds.length >= 1) {
+    const authorDoc = await db.query(
+      format('SELECT * FROM authors WHERE author_id IN %L', [authorIds])
+    );
 
-  if (authorDoc.rows.length !== authorIds.length)
-    throw new Error('authorIds array not valid');
+    if (authorDoc.rows.length !== authorIds.length)
+      throw new Error('authorIds array not valid');
 
-  if (authorDoc.rows.length === 0)
-    throw new Error('author with given id not found');
+    if (authorDoc.rows.length === 0)
+      throw new Error('author with given id not found');
 
-  await db.query('BEGIN');
+    await db.query('BEGIN');
 
-  const bookDoc = await db.query(
-    'INSERT INTO books(book_name) VALUES($1) RETURNING *',
-    [bookName]
-  );
-  const bookId = bookDoc.rows[0].book_id;
-  if (bookId == null) throw new Error('bookId not defined');
-  const connectValues = authorIds.map((author_id) => [author_id, bookId]);
+    const bookDoc = await db.query(
+      'INSERT INTO books(book_name) VALUES($1) RETURNING *',
+      [bookName]
+    );
+    const bookId = bookDoc.rows[0].book_id;
+    if (bookId == null) throw new Error('bookId not defined');
+    const connectValues = authorIds.map((author_id) => [author_id, bookId]);
 
-  const connectDoc = await db.query(
-    format(
-      'INSERT INTO authors_books(author_id, book_id) VALUES %L RETURNING *',
-      connectValues
-    )
-  );
+    const connectDoc = await db.query(
+      format(
+        'INSERT INTO authors_books(author_id, book_id) VALUES %L RETURNING *',
+        connectValues
+      )
+    );
 
-  await db.query('COMMIT');
+    await db.query('COMMIT');
 
-  res.send(connectDoc.rows);
+    res.send(bookDoc.rows[0]);
+  } else {
+    // create book with no author
+    const bookDoc = await db.query(
+      'INSERT INTO books(book_name) VALUES($1) RETURNING *',
+      [bookName]
+    );
+    res.send(bookDoc.rows[0]);
+  }
 });
 
 router.delete('/:id', async (req, res) => {
