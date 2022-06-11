@@ -1,5 +1,5 @@
 import { Outlet, Link as RouterLink } from 'react-router-dom';
-import { AppBar, Link, Toolbar } from '@mui/material';
+import { AppBar, Link, Toolbar, Container } from '@mui/material';
 
 const MainLayout = () => {
   return (
@@ -24,7 +24,9 @@ const MainLayout = () => {
           </Link>
         </Toolbar>
       </AppBar>
-      <Outlet />
+      <Container fixed sx={{ py: 4 }}>
+        <Outlet />
+      </Container>
     </>
   );
 };

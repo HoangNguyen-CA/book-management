@@ -21,7 +21,7 @@ app.use(async (err, req, res, next) => {
 
   let message = 'internal server error';
   if (err.message) message = err.message;
-  res.send(message);
+  res.status(400).send(message);
 });
 
 app.listen(PORT, () => {

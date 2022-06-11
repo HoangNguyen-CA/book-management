@@ -1,10 +1,14 @@
 import { useFetch } from 'use-http';
 import AuthorInfo from '../models/authorInfo';
-import { Grid, Container, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import Author from '../components/Author/Author';
 
 const Authors = () => {
-  const { loading, error, data } = useFetch<AuthorInfo[]>('/authors', {}, []);
+  const { loading, error, data } = useFetch<AuthorInfo[]>(
+    '/api/authors',
+    {},
+    []
+  );
 
   let element: React.ReactNode = <></>;
   if (loading) {
@@ -20,14 +24,14 @@ const Authors = () => {
   }
 
   return (
-    <Container fixed>
-      <Typography variant='h2' component='h1' sx={{ mt: 4, mb: 3 }}>
+    <>
+      <Typography variant='h2' component='h1' sx={{ mb: 3 }}>
         Authors
       </Typography>
       <Grid container spacing={2} sx={{ my: 2 }}>
         {element}
       </Grid>
-    </Container>
+    </>
   );
 };
 

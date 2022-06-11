@@ -1,10 +1,10 @@
 import { useFetch } from 'use-http';
 import BookInfo from '../models/bookInfo';
-import { Grid, Container, Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import BookPreview from '../components/Book/BookPreview';
 
 const Books = () => {
-  const { loading, error, data } = useFetch<BookInfo[]>('/books', {}, []);
+  const { loading, error, data } = useFetch<BookInfo[]>('/api/books', {}, []);
 
   let element: React.ReactNode = <></>;
   if (loading) {
@@ -20,14 +20,14 @@ const Books = () => {
   }
 
   return (
-    <Container fixed>
-      <Typography variant='h2' component='h1' sx={{ mt: 4, mb: 3 }}>
+    <>
+      <Typography variant='h2' component='h1' sx={{ mb: 3 }}>
         Books
       </Typography>
       <Grid container spacing={2}>
         {element}
       </Grid>
-    </Container>
+    </>
   );
 };
 

@@ -1,11 +1,13 @@
 import { Paper, Typography, Stack } from '@mui/material';
 import BookInfo from '../../models/bookInfo';
+import { useNavigate } from 'react-router';
 
 interface Props {
   book: BookInfo;
 }
 
 const BookPreview = ({ book }: Props) => {
+  const navigate = useNavigate();
   const authors =
     book.authors.length > 0
       ? book.authors.map((a) => a.author_name).join(', ')
@@ -18,6 +20,7 @@ const BookPreview = ({ book }: Props) => {
         textAlign: 'center',
         color: 'deepPurple-500',
       }}
+      onClick={() => navigate(`/books/${book.book_id}`)}
     >
       <Stack>
         <Typography variant='caption'> {book.book_id}</Typography>

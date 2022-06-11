@@ -13,7 +13,8 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path='/' element={<Home />}></Route>
           <Route path='/authors' element={<Authors />}></Route>
-          <Route path='/books' element={<Books />}>
+          <Route path='/books'>
+            <Route index element={<Books />}></Route>
             <Route path=':bookId' element={<Book />}></Route>
           </Route>
         </Route>
