@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const AuthorsProvider = ({ children }: Props) => {
-  const { get, post, loading, error } = useFetch<AuthorInfo[]>('/api');
+  const { get, post, del, loading, error } = useFetch<AuthorInfo[]>('/api');
 
   const [authors, setAuthors] = useState<AuthorInfo[]>([]);
 
@@ -37,13 +37,30 @@ export const AuthorsProvider = ({ children }: Props) => {
     }
   };
 
+  const deleteAuthor = async (id: string) => {
+    try {
+      const res = await del(`/authors/${id}`);
+      console.log(res);
+      setAuthors(authors.filter((a) => a.author_id !== id));
+    } catch (e) {
+      console.log('Error in deleteAuthor:', e);
+    }
+  };
+
   useEffect(() => {
     loadAuthors();
   }, []);
 
   return (
     <AuthorsContext.Provider
-      value={{ authors, loading, error, createAuthor, loadAuthors }}
+      value={{
+        authors,
+        loading,
+        error,
+        createAuthor,
+        loadAuthors,
+        deleteAuthor,
+      }}
     >
       {children}
     </AuthorsContext.Provider>

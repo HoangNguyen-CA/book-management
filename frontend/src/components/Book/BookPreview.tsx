@@ -1,4 +1,5 @@
 import { Paper, Typography, Stack } from '@mui/material';
+import { Delete } from '@mui/icons-material';
 import BookInfo from '../../models/bookInfo';
 import { useNavigate } from 'react-router';
 

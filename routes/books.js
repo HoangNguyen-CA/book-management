@@ -91,14 +91,14 @@ router.post('/', async (req, res) => {
 
     await db.query('COMMIT');
 
-    res.send(bookDoc.rows[0]);
+    res.send([{ ...bookDoc.rows[0], authors: authorDoc.rows }]);
   } else {
     // create book with no author
     const bookDoc = await db.query(
       'INSERT INTO books(book_name) VALUES($1) RETURNING *',
       [bookName]
     );
-    res.send(bookDoc.rows[0]);
+    res.send([{ ...bookDoc.rows[0], authors: [] }]);
   }
 });
 

@@ -7,6 +7,19 @@ const Authors = () => {
   const data = useContext(AuthorsContext);
   const [name, setName] = useState('');
 
+  const handleCreate = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!data) return;
+    e.preventDefault();
+    const { createAuthor } = data;
+    createAuthor(name);
+  };
+
+  const handleDelete = (id: string) => {
+    if (!data) return;
+    const { deleteAuthor } = data;
+    deleteAuthor(id);
+  };
+
   let element: React.ReactNode = <></>;
 
   if (data) {
@@ -18,19 +31,11 @@ const Authors = () => {
     } else if (authors) {
       element = authors.map((a) => (
         <Grid item xs={12} sm={6} md={4} lg={3} key={a.author_id}>
-          <Author author={a}></Author>
+          <Author author={a} onDelete={handleDelete}></Author>
         </Grid>
       ));
     }
   }
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (data) {
-      const { createAuthor } = data;
-      createAuthor(name);
-    }
-  };
 
   return (
     <>
@@ -43,9 +48,10 @@ const Authors = () => {
       <Typography variant='h6' sx={{ mb: 1 }}>
         Add Author
       </Typography>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleCreate}>
         <Box sx={{ display: 'flex' }}>
           <TextField
+            required
             variant='filled'
             value={name}
             label="Author's Name"
