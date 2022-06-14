@@ -1,8 +1,7 @@
 import { useParams } from 'react-router';
 import { useFetch } from 'use-http';
 
-import { Typography, List, ListItemButton, IconButton } from '@mui/material';
-import { Delete as DeleteIcon } from '@mui/icons-material';
+import { Typography, List, ListItemButton } from '@mui/material';
 import BookInfo from '../models/bookInfo';
 
 const Book = () => {

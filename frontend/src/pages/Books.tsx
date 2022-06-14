@@ -21,10 +21,10 @@ const Books = () => {
 
   return (
     <>
-      <Typography variant='h2' component='h1' sx={{ mb: 3 }}>
+      <Typography variant='h2' component='h1'>
         Books
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} sx={{ my: 2 }}>
         {element}
       </Grid>
     </>
