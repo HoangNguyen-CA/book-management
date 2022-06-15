@@ -1,5 +1,4 @@
-import { Paper, Typography, Stack } from '@mui/material';
-import { Delete } from '@mui/icons-material';
+import { Card, Typography, Stack, CardActionArea } from '@mui/material';
 import BookInfo from '../../models/bookInfo';
 import { useNavigate } from 'react-router';
 
@@ -14,21 +13,22 @@ const BookPreview = ({ book }: Props) => {
       ? book.authors.map((a) => a.author_name).join(', ')
       : 'No author';
   return (
-    <Paper
+    <Card
       variant='outlined'
       sx={{
-        p: 2,
         textAlign: 'center',
         color: 'deepPurple-500',
       }}
       onClick={() => navigate(`/books/${book.book_id}`)}
     >
-      <Stack>
-        <Typography variant='caption'> {book.book_id}</Typography>
-        <Typography variant='h4'> {book.book_name}</Typography>
-        <Typography variant='subtitle1'>Written by: {authors}</Typography>
-      </Stack>
-    </Paper>
+      <CardActionArea sx={{ p: 2 }}>
+        <Stack>
+          <Typography variant='caption'> {book.book_id}</Typography>
+          <Typography variant='h4'> {book.book_name}</Typography>
+          <Typography variant='subtitle1'>Written by: {authors}</Typography>
+        </Stack>
+      </CardActionArea>
+    </Card>
   );
 };
 

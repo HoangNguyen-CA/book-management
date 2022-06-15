@@ -44,3 +44,8 @@ ON DELETE CASCADE;
 
 /* Multiple join */
 SELECT books.book_id, book_name, authors.author_id, author_name FROM books LEFT JOIN authors_books ON books.book_id = authors_books.book_id LEFT JOIN authors ON authors_books.author_id = authors.author_id;
+
+/* Add unique constraint to junction */
+
+ALTER TABLE authors_books
+ADD CONSTRAINT uniq UNIQUE (author_id, book_id);

@@ -69,9 +69,6 @@ router.post('/', async (req, res) => {
     if (authorDoc.rows.length !== authorIds.length)
       throw new Error('authorIds array not valid');
 
-    if (authorDoc.rows.length === 0)
-      throw new Error('author with given id not found');
-
     await db.query('BEGIN');
 
     const bookDoc = await db.query(
@@ -124,6 +121,83 @@ router.put('/:id', async (req, res) => {
   );
 
   res.send(doc.rows);
+});
+
+router.post('/:id/authors', async (req, res) => {
+  const { id } = req.params;
+  const { authorIds } = req.body;
+
+  const bookDoc = await db.query('SELECT * FROM books WHERE book_id = $1', [
+    id,
+  ]);
+  if (bookDoc.rows.length === 0)
+    throw new Error("book with given id doesn't exist");
+  const bookId = bookDoc.rows[0].book_id;
+
+  /* verify authorIds */
+
+  if (authorIds == undefined) throw new Error('authorIds not defined');
+  if (authorIds.constructor !== Array)
+    throw new Error('authorIds must be an array');
+  if (authorIds.length === 0) throw new Error('authorIds cannot be empty');
+
+  const authorDoc = await db.query(
+    format('SELECT * FROM authors WHERE author_id IN %L', [authorIds])
+  );
+
+  if (authorDoc.rows.length !== authorIds.length)
+    throw new Error('authorIds array not valid');
+
+  /* connect authorIds */
+
+  const connectValues = authorDoc.rows.map((a) => [a.author_id, bookId]);
+
+  const connectDoc = await db.query(
+    format(
+      'INSERT INTO authors_books(author_id, book_id) VALUES %L RETURNING *',
+      connectValues
+    )
+  );
+
+  res.send(connectDoc.rows);
+});
+
+//TODO: Verify Correctness
+router.delete('/:id/authors', async (req, res) => {
+  const { id } = req.params;
+  const { authorIds } = req.body;
+
+  const bookDoc = await db.query('SELECT * FROM books WHERE book_id = $1', [
+    id,
+  ]);
+  if (bookDoc.rows.length === 0)
+    throw new Error("book with given id doesn't exist");
+  const bookId = bookDoc.rows[0].book_id;
+
+  /* verify authorIds */
+
+  if (authorIds == undefined) throw new Error('authorIds not defined');
+  if (authorIds.constructor !== Array)
+    throw new Error('authorIds must be an array');
+  if (authorIds.length === 0) throw new Error('authorIds cannot be empty');
+
+  const authorDoc = await db.query(
+    format('SELECT * FROM authors WHERE author_id IN %L', [authorIds])
+  );
+
+  if (authorDoc.rows.length !== authorIds.length)
+    throw new Error('authorIds array not valid');
+  console.log('HERE');
+
+  /* delete authorIds */
+  const connectDoc = await db.query(
+    format(
+      'DELETE FROM authors_books WHERE book_id = %L AND author_id IN (%L) RETURNING *',
+      bookId,
+      authorIds
+    )
+  );
+  res.send(connectDoc.rows);
 });
 
 module.exports = router;
