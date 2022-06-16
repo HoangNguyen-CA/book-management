@@ -127,6 +127,8 @@ router.post('/:id/authors', async (req, res) => {
   const { id } = req.params;
   const { authorIds } = req.body;
 
+  /* verify book*/
+
   const bookDoc = await db.query('SELECT * FROM books WHERE book_id = $1', [
     id,
   ]);
@@ -162,14 +164,16 @@ router.post('/:id/authors', async (req, res) => {
   res.send(connectDoc.rows);
 });
 
-//TODO: Verify Correctness
 router.delete('/:id/authors', async (req, res) => {
   const { id } = req.params;
   const { authorIds } = req.body;
 
+  /* verify book */
+
   const bookDoc = await db.query('SELECT * FROM books WHERE book_id = $1', [
     id,
   ]);
+
   if (bookDoc.rows.length === 0)
     throw new Error("book with given id doesn't exist");
   const bookId = bookDoc.rows[0].book_id;
@@ -187,7 +191,6 @@ router.delete('/:id/authors', async (req, res) => {
 
   if (authorDoc.rows.length !== authorIds.length)
     throw new Error('authorIds array not valid');
-  console.log('HERE');
 
   /* delete authorIds */
   const connectDoc = await db.query(

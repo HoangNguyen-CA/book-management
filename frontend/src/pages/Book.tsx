@@ -3,16 +3,16 @@ import { useFetch } from 'use-http';
 import {
   Typography,
   List,
-  ListItemButton,
+  ListItem,
   Button,
   Select,
   MenuItem,
   Box,
   SelectChangeEvent,
+  IconButton,
 } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
 import BookInfo from '../models/bookInfo';
-import AuthorInfo from '../models/authorInfo';
 import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router';
 import { AuthorsContext } from '../context/AuthorsContext';
@@ -21,7 +21,9 @@ const Book = () => {
   const { bookId } = useParams();
   const [book, setBook] = useState<BookInfo>();
   const navigate = useNavigate();
-  const { loading, error, get, del } = useFetch<BookInfo>('/api');
+  const { loading, error, get, del, post } = useFetch<BookInfo>('/api', {
+    headers: { 'Content-Type': 'application/json' },
+  });
   const [selectedAuthor, setSelectedAuthor] = useState<string>('');
 
   const authorsContext = useContext(AuthorsContext);
@@ -38,16 +40,37 @@ const Book = () => {
 
   const handleDelete = async () => {
     if (!book) return;
-    try {
-      await del(`/books/${book.book_id}`);
-      navigate('/books');
-    } catch (e) {
-      console.log('Error when deleting book: ', e);
-    }
+    await del(`/books/${book.book_id}`);
+    navigate('/books');
   };
 
   const handleChangeAuthor = (e: SelectChangeEvent) => {
     setSelectedAuthor(e.target.value);
+  };
+
+  const handleAddAuthor = async () => {
+    if (!selectedAuthor || !book) return;
+    if (book.authors.find((a) => a.author_id === selectedAuthor)) return; // DUPLICATE AUTHOR
+
+    await post(`/books/${bookId}/authors`, {
+      authorIds: [selectedAuthor],
+    });
+
+    const addedAuthor = authors.find((a) => a.author_id === selectedAuthor);
+    if (!addedAuthor) return;
+
+    const updatedBook = { ...book, authors: [...book.authors, addedAuthor] };
+    setBook(updatedBook);
+  };
+
+  const handleDeleteAuthor = async (id: string) => {
+    if (!book) return;
+    await del(`/books/${bookId}/authors`, { authorIds: [id], hello: 'HELLO' });
+    const updatedBook = {
+      ...book,
+      authors: book.authors.filter((a) => a.author_id !== id),
+    };
+    setBook(updatedBook);
   };
 
   let element;
@@ -64,9 +87,25 @@ const Book = () => {
         <Typography variant='subtitle1'>Authors:</Typography>
         <List sx={{ maxWidth: '400px' }}>
           {book.authors.map((a) => (
-            <>
-              <ListItemButton divider>{a.author_name}</ListItemButton>
-            </>
+            <ListItem
+              divider
+              key={a.author_id}
+              secondaryAction={
+                <IconButton
+                  edge='end'
+                  aria-label='comments'
+                  onClick={() => handleDeleteAuthor(a.author_id)}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              }
+            >
+              <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
+                {a.author_id}.
+              </Typography>
+              &nbsp;
+              {a.author_name}
+            </ListItem>
           ))}
         </List>
         <Box sx={{ my: 5, display: 'flex' }}>
@@ -77,10 +116,16 @@ const Book = () => {
           >
             <MenuItem value=''>Select Author</MenuItem>
             {authors.map((a) => {
-              return <MenuItem value={a.author_id}>{a.author_name}</MenuItem>;
+              return (
+                <MenuItem key={a.author_id} value={a.author_id}>
+                  {a.author_name}
+                </MenuItem>
+              );
             })}
           </Select>
-          <Button variant='contained'>Add Author</Button>
+          <Button variant='contained' onClick={handleAddAuthor}>
+            Add Author
+          </Button>
         </Box>
 
         <Button
