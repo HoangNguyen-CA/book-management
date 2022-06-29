@@ -21,7 +21,7 @@ const Book = () => {
   const { bookId } = useParams();
   const [book, setBook] = useState<BookInfo>();
   const navigate = useNavigate();
-  const { loading, error, get, del, post } = useFetch<BookInfo>('/api', {
+  const { loading, error, get, del, post } = useFetch<BookInfo>(`${process.env.REACT_APP_API_URL}/api`, {
     headers: { 'Content-Type': 'application/json' },
   });
   const [selectedAuthor, setSelectedAuthor] = useState<string>('');

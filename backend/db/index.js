@@ -7,6 +7,7 @@ const poolConfig = {
   port: 5432,
   database: process.env.PG_DATABASE || "postgres",
 }
+
 const pool = new Pool(poolConfig);
 
 module.exports = {

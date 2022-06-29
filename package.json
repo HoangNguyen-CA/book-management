@@ -1,0 +1,26 @@
+{
+  "name": "books-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "frontend": "cd frontend && npm start",
+    "backend": "docker-compose -f docker-compose.dev.yml up",
+    "dev": "concurrently \"npm run frontend\" \"npm run backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HoangNguyen-CA/book-club.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HoangNguyen-CA/book-club/issues"
+  },
+  "homepage": "https://github.com/HoangNguyen-CA/book-club#readme",
+  "devDependencies": {
+    "concurrently": "^7.2.2"
+  }
+}

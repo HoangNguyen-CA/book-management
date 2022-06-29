@@ -5,7 +5,7 @@ import BookPreview from '../components/Book/BookPreview';
 import { useState, useEffect } from 'react';
 
 const Books = () => {
-  const { loading, error, get, post } = useFetch<BookInfo[]>('/api');
+  const { loading, error, get, post } = useFetch<BookInfo[]>(`${process.env.REACT_APP_API_URL}/api`);
   const [name, setName] = useState('');
   const [books, setBooks] = useState<BookInfo[]>();
 

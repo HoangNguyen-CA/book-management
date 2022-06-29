@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const db = require('./db/index');
 const path = require('path');
+const cors = require('cors');
 
 const mountRoutes = require('./routes/index');
 
@@ -9,6 +10,7 @@ const app = express();
 
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(cors());
 
 mountRoutes(app);
 

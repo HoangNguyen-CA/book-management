@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const AuthorsProvider = ({ children }: Props) => {
-  const { get, post, del, loading, error } = useFetch<AuthorInfo[]>('/api');
+  const { get, post, del, loading, error } = useFetch<AuthorInfo[]>(`${process.env.REACT_APP_API_URL}/api`);
 
   const [authors, setAuthors] = useState<AuthorInfo[]>([]);
 
