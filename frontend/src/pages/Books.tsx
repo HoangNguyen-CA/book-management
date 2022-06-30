@@ -1,47 +1,35 @@
-import { useFetch } from 'use-http';
 import BookInfo from '../models/bookInfo';
 import { Grid, Typography, Box, TextField, Button } from '@mui/material';
 import BookPreview from '../components/Book/BookPreview';
 import { useState, useEffect } from 'react';
+import {getBooks, postBook} from '../services/bookService';
 
 const Books = () => {
-  const { loading, error, get, post } = useFetch<BookInfo[]>(`${process.env.REACT_APP_API_URL}/api`);
   const [name, setName] = useState('');
-  const [books, setBooks] = useState<BookInfo[]>();
+  const [books, setBooks] = useState<BookInfo[]>([]);
 
   useEffect(() => {
     const loadBooks = async () => {
-      let res = await get('/books');
+      let res = await getBooks();
       setBooks(res);
     };
     loadBooks();
   }, []);
 
   const handleCreate = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (!name || !books) return;
     e.preventDefault();
-    try {
-      const res = await post('/books', { bookName: name, authorIds: [] });
-      setBooks([...books, res[0]]);
-    } catch (e) {
-      console.log('Error when creating book: ', e);
-    }
+    if (!name || !books) return;
+    const res = await postBook( name, [] );
+    setBooks([...books, res[0]]);
   };
 
-  let element: React.ReactNode = <></>;
-  if (loading) {
-    element = <>Loading...</>;
-  } else if (error) {
-    element = <>Error</>;
-  } else if (books) {
-    element = books
+  let element: React.ReactNode = books
       .sort((a, b) => parseInt(a.book_id) - parseInt(b.book_id))
       .map((b) => (
         <Grid item xs={12} sm={6} md={4} lg={3} key={b.book_id}>
           <BookPreview book={b}></BookPreview>
         </Grid>
       ));
-  }
 
   return (
     <>

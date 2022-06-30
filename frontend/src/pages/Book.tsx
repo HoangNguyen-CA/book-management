@@ -1,5 +1,3 @@
-import { useParams } from 'react-router';
-import { useFetch } from 'use-http';
 import {
   Typography,
   List,
@@ -10,21 +8,25 @@ import {
   Box,
   SelectChangeEvent,
   IconButton,
-} from '@mui/material';
-import { Delete as DeleteIcon } from '@mui/icons-material';
-import BookInfo from '../models/bookInfo';
-import { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router';
-import { AuthorsContext } from '../context/AuthorsContext';
+} from "@mui/material";
+import { Delete as DeleteIcon } from "@mui/icons-material";
+import { useEffect, useState, useContext } from "react";
+import { useNavigate, useParams } from "react-router";
+import { AuthorsContext } from "../context/AuthorsContext";
+import {
+  getBook,
+  deleteBook,
+  postBookAuthor,
+  deleteBookAuthor,
+} from "../services/bookService";
+import BookInfo from "../models/bookInfo";
 
 const Book = () => {
-  const { bookId } = useParams();
+  const { bookId = "" } = useParams();
   const [book, setBook] = useState<BookInfo>();
   const navigate = useNavigate();
-  const { loading, error, get, del, post } = useFetch<BookInfo>(`${process.env.REACT_APP_API_URL}/api`, {
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const [selectedAuthor, setSelectedAuthor] = useState<string>('');
+
+  const [selectedAuthor, setSelectedAuthor] = useState<string>("");
 
   const authorsContext = useContext(AuthorsContext);
 
@@ -32,16 +34,16 @@ const Book = () => {
 
   useEffect(() => {
     const loadBook = async () => {
-      const res = await get(`/books/${bookId}`);
+      const res = await getBook(bookId);
       setBook(res);
     };
     loadBook();
-  }, []);
+  }, [bookId]);
 
   const handleDelete = async () => {
     if (!book) return;
-    await del(`/books/${book.book_id}`);
-    navigate('/books');
+    await deleteBook(bookId);
+    navigate("/books");
   };
 
   const handleChangeAuthor = (e: SelectChangeEvent) => {
@@ -52,9 +54,7 @@ const Book = () => {
     if (!selectedAuthor || !book) return;
     if (book.authors.find((a) => a.author_id === selectedAuthor)) return; // DUPLICATE AUTHOR
 
-    await post(`/books/${bookId}/authors`, {
-      authorIds: [selectedAuthor],
-    });
+    await postBookAuthor(bookId, [selectedAuthor]);
 
     const addedAuthor = authors.find((a) => a.author_id === selectedAuthor);
     if (!addedAuthor) return;
@@ -65,7 +65,7 @@ const Book = () => {
 
   const handleDeleteAuthor = async (id: string) => {
     if (!book) return;
-    await del(`/books/${bookId}/authors`, { authorIds: [id], hello: 'HELLO' });
+    await deleteBookAuthor(bookId, [id]);
     const updatedBook = {
       ...book,
       authors: book.authors.filter((a) => a.author_id !== id),
@@ -73,34 +73,31 @@ const Book = () => {
     setBook(updatedBook);
   };
 
-  let element;
-  if (loading) {
-    element = <Typography>Loading...</Typography>;
-  } else if (error) {
-    element = <Typography>No book exists</Typography>;
-  } else if (book) {
+  let element = <></>;
+
+  if (book) {
     element = (
       <>
-        <Typography variant='h2' component='h1' sx={{ mb: 2 }}>
+        <Typography variant="h2" component="h1" sx={{ mb: 2 }}>
           {book.book_name}
         </Typography>
-        <Typography variant='subtitle1'>Authors:</Typography>
-        <List sx={{ maxWidth: '400px' }}>
+        <Typography variant="subtitle1">Authors:</Typography>
+        <List sx={{ maxWidth: "400px" }}>
           {book.authors.map((a) => (
             <ListItem
               divider
               key={a.author_id}
               secondaryAction={
                 <IconButton
-                  edge='end'
-                  aria-label='comments'
+                  edge="end"
+                  aria-label="comments"
                   onClick={() => handleDeleteAuthor(a.author_id)}
                 >
                   <DeleteIcon />
                 </IconButton>
               }
             >
-              <Typography sx={{ color: 'text.secondary', fontSize: 14 }}>
+              <Typography sx={{ color: "text.secondary", fontSize: 14 }}>
                 {a.author_id}.
               </Typography>
               &nbsp;
@@ -108,13 +105,13 @@ const Book = () => {
             </ListItem>
           ))}
         </List>
-        <Box sx={{ my: 5, display: 'flex' }}>
+        <Box sx={{ my: 5, display: "flex" }}>
           <Select
             displayEmpty
             value={selectedAuthor}
             onChange={handleChangeAuthor}
           >
-            <MenuItem value=''>Select Author</MenuItem>
+            <MenuItem value="">Select Author</MenuItem>
             {authors.map((a) => {
               return (
                 <MenuItem key={a.author_id} value={a.author_id}>
@@ -123,16 +120,16 @@ const Book = () => {
               );
             })}
           </Select>
-          <Button variant='contained' onClick={handleAddAuthor}>
+          <Button variant="contained" onClick={handleAddAuthor}>
             Add Author
           </Button>
         </Box>
 
         <Button
           startIcon={<DeleteIcon />}
-          variant='outlined'
-          color='error'
-          sx={{ width: '200px', mx: 'auto', mt: 1 }}
+          variant="outlined"
+          color="error"
+          sx={{ width: "200px", mx: "auto", mt: 1 }}
           onClick={handleDelete}
         >
           Delete Book

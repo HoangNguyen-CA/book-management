@@ -23,12 +23,8 @@ const Authors = () => {
   let element: React.ReactNode = <></>;
 
   if (data) {
-    const { authors, loading, error } = data;
-    if (loading) {
-      element = <>Loading...</>;
-    } else if (error) {
-      element = <>Error</>;
-    } else if (authors) {
+    const { authors} = data;
+    if (authors) {
       element = authors.map((a) => (
         <Grid item xs={12} sm={6} md={4} lg={3} key={a.author_id}>
           <Author author={a} onDelete={handleDelete}></Author>

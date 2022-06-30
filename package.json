@@ -6,8 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "frontend": "cd frontend && npm start",
-    "backend": "docker-compose -f docker-compose.dev.yml up",
-    "dev": "concurrently \"npm run frontend\" \"npm run backend\""
+    "backend-up": "docker-compose -f docker-compose.dev.yml up",
+    "backend-down": "docker-compose -f docker-compose.dev.yml down",
+    "dev": "concurrently \"npm run frontend\" \"npm run backend-up\"",
+    "install-dev": "npm install && cd frontend && npm install"
   },
   "repository": {
     "type": "git",
