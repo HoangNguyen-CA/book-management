@@ -8,21 +8,20 @@
     "frontend": "cd frontend && npm start",
     "backend-up": "docker-compose -f docker-compose.dev.yml up",
     "backend-down": "docker-compose -f docker-compose.dev.yml down",
-    "dev": "concurrently \"npm run frontend\" \"npm run backend-up\"",
+    "prod": "sudo docker-compose -f docker-compose.prod.yml up",
+    "prod-down": "docker-compose -f docker-compose.prod.yml down",
+    "dev": "npm run frontend & npm run backend-up",
     "install-dev": "npm install && cd frontend && npm install"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/HoangNguyen-CA/book-club.git"
+    "url": "git+https://github.com/HoangNguyen-CA/book-management.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/HoangNguyen-CA/book-club/issues"
+    "url": "https://github.com/HoangNguyen-CA/book-management/issues"
   },
-  "homepage": "https://github.com/HoangNguyen-CA/book-club#readme",
-  "devDependencies": {
-    "concurrently": "^7.2.2"
-  }
+  "homepage": "https://github.com/HoangNguyen-CA/book-management#readme"
 }

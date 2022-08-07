@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  app: 
-    image: hoangnguyenca/books-app
-    environment: 
+  backend:
+    image: hoangnguyenca/book-management-backend
+    environment:
       PORT: 3000
       NODE_ENV: production
       PG_USER: postgres
@@ -18,13 +18,14 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: password
-      
+      PG_USER: postgres
+
   nginx:
     restart: always
-    build: 
-      context: './nginx'
-    ports: 
+    build:
+      context: "./nginx"
+    ports:
       - 80:80
 
-volumes: 
+volumes:
   book-postgres-data:
